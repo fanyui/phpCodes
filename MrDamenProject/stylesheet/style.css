@@ -1,0 +1,7 @@
+
+
+.bag-item {border-bottom: #79b946 1px dotted;padding: 10px;}
+.product-item {	float:left;	background:#F0F0F0;	margin:15px;	padding:5px;}
+.product-item div{text-align:center;	margin:10px;}
+.product-price {color:#F08426;}
+.product-image {height:100px;background-color:#FFF;}
