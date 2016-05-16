@@ -8,6 +8,6 @@ $name = isset($_GET['name']) ? $_GET['name'] : "";
 // remove the item from the array
 unset($_SESSION['bag_item'][$id]);
  
-// redirect to product list and tell the user it was added to cart
+// redirect to product list and tell the user it was added to bag
 header('Location: bag.php?action=removed&id=' . $id . '&name=' . $name);
 ?>

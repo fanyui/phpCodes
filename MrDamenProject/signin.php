@@ -7,7 +7,7 @@
 </head>
 <body>
 <div class="container">
-	<form class="form-signin" method="post" role="form.php">
+	<form class="form-signin" method="post" action="form.php">
 		    <h2 class="form-signin-heading">Please sign in</h2>
 		    <input type="email" name="email" class="form-control" placeholder="Email address" required autofocus>
 		    <input type="password" name="password" class="form-control" placeholder="Password" required>
