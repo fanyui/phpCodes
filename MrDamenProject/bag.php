@@ -125,7 +125,7 @@ if(count($_SESSION['bag_item'])>0){
           </div>
           <div id="panel4">
             <input type="text" placeholder="use mobile money" class="form-control" name="mobileMoney">
-            <button type="submit" name="submitted" value="submit">submit</button>
+            <button type="submit" name="register" value="submit">submit</button>
             <button id="cancelpanel4" type="button" class="btn btn-sm btn-warning">Cancel</button>
           </div>         
       </form>

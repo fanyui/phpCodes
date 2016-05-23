@@ -11,20 +11,20 @@ include("include/included_functions.php");
                $errors[]="you forgot to enter first name";
             }
             else { 
-                $fn= mysqli_real_escape_string($_POST["firstName"]);
+                $fn= mysqli_real_escape_string($dbc,$_POST["firstName"]);
             }
 
            if (empty($_POST["lastName"])) {
                 $errors[]="please enter last name "; 
             } 
             else{
-                $ln=mysqli_real_escape_string($_POST["lastName"]);
+                $ln=mysqli_real_escape_string($dbc,$_POST["lastName"]);
             }
             if (empty($_POST["gender"])) {
                 $errors[]="please enter gender "; 
             } 
             else{
-                $gender=mysqli_real_escape_string($_POST["gender"]);
+                $gender=mysqli_real_escape_string($dbc,$_POST["gender"]);
             }
 
 
@@ -32,102 +32,113 @@ include("include/included_functions.php");
                 $errors[]="please enter phoneNumber "; 
             } 
             else{
-                $pn=mysqli_real_escape_string($_POST["phoneNumber"]);
+                $pn=mysqli_real_escape_string($dbc,$_POST["phoneNumber"]);
             }
 
              if (empty($_POST["email"])) {
                 $errors[]="please enter email "; 
             } 
             else{
-                $email=mysqli_real_escape_string($_POST["email"]);
+                $email=mysqli_real_escape_string($dbc,$_POST["email"]);
             }
 
              if (empty($_POST["region"])) {
                 $errors[]="please enter region "; 
             } 
             else{
-                $region= mysqli_real_escape_string($_POST["region"]);
+                $region= mysqli_real_escape_string($dbc,$_POST["region"]);
             }
             //
              if (empty($_POST["town"])) {
                 $errors[]="please enter town "; 
             } 
             else{
-                $town= mysqli_real_escape_string($_POST["town"]);
+                $town= mysqli_real_escape_string($dbc,$_POST["town"]);
             }
              if (empty($_POST["commentArea"])) {
                 $errors[]="please enter comment "; 
             } 
             else{
-                $comment=mysqli_real_escape_string($_POST["commentArea"]);
+                $comment=mysqli_real_escape_string($dbc,$_POST["commentArea"]);
             }
             if (empty($_POST["checkpay"])) {
                 $errors[]="please enter checkpay "; 
             } 
             else{
-                $checkbox=mysqli_real_escape_string($_POST["checkpay"]);
+                $checkbox=mysqli_real_escape_string($dbc,$_POST["checkpay"]);
             }
-
-
+//declaring global to be used in queries
+             $ortherId = "";
+             $custId = "";
                 //all fields have been correctly filled
             if(empty($errors)){
-                //connect to database and issue querry
-                require_once('includes/connection.php');
+              
                 $dbc=mysqli_connect(DB_HOST,DB_USER,DB_PASSWORD,DB_NAME) OR DIE ('COULD NOT CONNECT TO MYSQL:'.mysqliconnect_error());
 
                     //query to create customer information
-                $q1 = "INSERT INTO  customer(customerFirstName,customerLastName,genderId) VALUES ('$fn','$ln','$gender')";
+                $q1 = "insert into  customer(customerFirstName,customerSecondName,genderId) values('$fn','$ln','$gender')";
                 // Run the query.
-                $r = @mysqli_query ($dbc, $q1);
-
+                $r = @mysqli_query($dbc,$q1);
+                $num = @mysqli_num_rows($r);
+                if(!$r)
+                    echo "could not do it" .mysqli_error($dbc);
                 //query to get customer id so that it wil be used to add address and order
-                $qs = "select customerId from customer where customerFirstName=$fn desc limit 1";
+                $qs = "select customerId from customer  order by customerId DESC limit 1";
                 // Run the query.
-                $rs = @mysqli_query ($dbc, $qs);
+                $rs = @mysqli_query ($dbc,$qs);
+                if(!$qs)
+                    echo "could not select get customer id " .mysqli_error($dbc);
                 $num = @mysqli_num_rows($rs);
-                 if ($num == 1) { // Match was made.
+
+                if ($num == 1) { // Match was made.
                     // Get the customer id:
-                    $custId = mysqli_fetch_array($rs,MYSQLI_NUM);
+                   $custId = mysqli_fetch_array($rs,MYSQLI_NUM);
                 }
-
+             
                //query to create customer address
-                $q2 = "INSERT INTO  custaddress(phoneNumber,email,region,town,customerId)  VALUES ('$pn','$email','$town','$custId')";
+                $q2 = "insert into custaddress(phoneNumber,email,region,town,customerId)  values ('$pn','$email','$region','$town','$custId[0]')";
                 // Run the query.
-                $r2 = @mysqli_query ($dbc, $q2);
-
+                $r2 = @mysqli_query ($dbc,$q2);
+                    if(!$r2)
+                        echo "could not insert customer address " .mysqli_error($dbc);
                 //query to create and order
-                $salesPersonId=0;//this means sales has not been treated by any salesperson  
-                $q3 = "INSERT INTO orders(orderDate,customerId,sPersonId) values(now(),$custId,$salesPersonId)";
+                $salesPersonId=1;//this means sales has not been treated by any salesperson  
+                $q3 = "insert into orders(orderDate,customerId,sPersonId) values(now(),'$custId[0]',$salesPersonId)";
                 // Run the query
-                $r3 = @mysqli_query ($dbc, $q3);
-                if ($r && $r2 && $r3 && $rs) { 
-                    echo "done";
-                }
-
+                $r3 = @mysqli_query ($dbc,$q3);
+                if(!$r3)
+                    echo "could not create order " .mysqli_error($dbc);
                 //select the order id so that we will use it to fill the order details table 
-                $qorder = "select orderId from orders desc limit 1";
+                $qorder = "select orderId from orders order by orderId DESC limit 1";
                 // Run the query.
-                $rorder = @mysqli_query ($dbc, $qorder);
+                $rorder = @mysqli_query ($dbc,$qorder);
                 $num = @mysqli_num_rows($rorder);
+                if(!$rorder)
+                    echo "could not select order id " .mysqli_error($dbc);
                  if ($num == 1) { // Match was made.
                     // Get the order id:
-                    $ortherId = mysqli_fetch_array($rorder,MYSQLI_NUM);
+                  $ortherId = mysqli_fetch_array($rorder,MYSQLI_NUM);
+                  //echo "fetch array succeeded";
+
                 }
 
 
 
                 foreach ($_SESSION['bag_item'] as $key => $value) {
-                    $querry = "insert into orderdetails (ortherId,productId,quantity) values ($ortherId,$key,1)";
-                    $runquery = @mysqli_query($dbc,$querry);
+                	echo $key." order Id is  ".$ortherId[0]."<br/>";
+                    $query = "insert into orderdetails (orderId,productId,quantity) values ('$ortherId[0]','$key',1)";
+                    $runquery = @mysqli_query($dbc,$query);
                     if(!$runquery)
-                        echo 'Problem executing query';
+                        echo 'Problem updating order details records';
                 }
             }
             else{//one or more fields do not have values
                 foreach ($errors as $key) {
-                   echo '<b>$key</b> </br />';
+                   echo '<b>'.$key.'</b> </br />';
                 }
             }
         }
+        else
+        echo "form was not submitted throught the correct means<br>";
     ?>
 
