@@ -122,14 +122,36 @@ include("include/included_functions.php");
 
                 }
 
-
+                    //order details 
 
                 foreach ($_SESSION['bag_item'] as $key => $value) {
-                	echo $key." order Id is  ".$ortherId[0]."<br/>";
-                    $query = "insert into orderdetails (orderId,productId,quantity) values ('$ortherId[0]','$key',1)";
-                    $runquery = @mysqli_query($dbc,$query);
-                    if(!$runquery)
-                        echo 'Problem updating order details records';
+                    $qty=1;
+                	$getpdt = "select quantitySold,quantityBought from product where productId = $key";
+                    $rungetpdt = @mysqli_query($dbc,$getpdt);
+                    if(!$rungetpdt)
+                        echo "could not get quantity sold".mysqli_error($dbc);
+                    $qnt= mysqli_fetch_array($rungetpdt);
+                        //PRECAUTION ON PRODUCT AVAILABILITY
+                        if(($qnt["quantityBought"] - $qnt["quantitySold"])<=10 ){
+                            //send a mail to my box
+                        }
+                        //client demanded more than available stock
+                        if(($qnt["quantityBought"] - $qnt["quantitySold"])<$qty){
+                            //send a message to my box and to the user telling him of small stock
+                            echo "stock available is not up to the quantity you demanded";
+                        }
+                        else{
+                            
+                            $setpdt = "update product set quantitySold = ('$qnt[0]'+1) where productId= $key";
+                            $runsetpdt= mysqli_query($dbc,$setpdt);
+                            if(!$runsetpdt)
+                                echo "could not update quantity sold";
+
+                            $query = "insert into orderdetails (orderId,productId,quantity) values ('$ortherId[0]','$key',$qty)";
+                            $runquery = @mysqli_query($dbc,$query);
+                            if(!$runquery)
+                                echo 'Problem updating order details records';
+                        }
                 }
             }
             else{//one or more fields do not have values

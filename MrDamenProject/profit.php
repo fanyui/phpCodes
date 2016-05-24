@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -11,6 +12,7 @@
 
 </head>
 <body>
+
  <div class="bs-example">
     <nav id="navbar-example2" class="navbar navbar-default navbar-static" role="navigation">
       <div class="container-fluid">
@@ -32,9 +34,9 @@
               <ul class="dropdown-menu" role="menu" aria-labelledby="navbarDrop1">
                 <li><a href="profit.php?category=1" tabindex="-1">electronic</a></li>
                 <li><a href="profit.php?category=2" tabindex="-1">jewery</a></li>
-                <li><a href="profit.php?category=3" tabindex="-1">food stuff</a></li>
+                <li><a href="profit.php?category=3" tabindex="-1">cloths</a></li>
                 <li class="divider"></li>
-                <li><a href="profit.php?category=4" tabindex="-1">cloth</a></li>
+                <li><a href="profit.php?category=4" tabindex="-1">food Stuff</a></li>
               </ul>
             </li>
             <li><a href="signin.php"><span ><img src="images/hari.JPG" class="img-circle" alt="Cinque Terre" width="30" height="30"></span> sign out</a></li>
@@ -200,7 +202,7 @@
                    echo '<b>$key</b> </br />';
                 }
             }
-        }
+          }
         //php code for customer validation 
         else if (isset($_POST['register'])) {
    			
@@ -240,13 +242,25 @@
 		      else{
 		        foreach ($errors as $key) {
 		          # code...
-		        echo " - $key<br />\n";
+		        echo " - $key<br />";
 
 		        }  echo '<p>Please try again.</p>';
 
-		    }
- 		}
+		        }
+ 		    }
 
-    ?>
+
+ 
+
+require_once('include/connection.php');
+include("include/included_functions.php");
+$categoryValue=-1;//entinel value
+if(isset($_GET["category"])){
+    $categoryValue=$_GET['category']; 
+profit_by_category($categoryValue);
+}
+		
+
+?>
 </body>
 </html>
